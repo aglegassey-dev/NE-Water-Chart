@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom'
 import HomeScreen from './pages/HomeScreen'
 import RiverDetail from './pages/RiverDetail'
@@ -48,17 +49,37 @@ function BottomNav() {
 }
 
 export default function App() {
+  const [isOnline, setIsOnline] = useState(() => navigator.onLine)
+
+  useEffect(() => {
+    const up   = () => setIsOnline(true)
+    const down = () => setIsOnline(false)
+    window.addEventListener('online',  up)
+    window.addEventListener('offline', down)
+    return () => {
+      window.removeEventListener('online',  up)
+      window.removeEventListener('offline', down)
+    }
+  }, [])
+
   return (
-    <BrowserRouter>
-      <div style={{ paddingBottom: 70 }}>
-        <Routes>
-          <Route path="/"               element={<HomeScreen />} />
-          <Route path="/river/:riverId" element={<RiverDetail />} />
-          <Route path="/hatches"        element={<HatchCalendar />} />
-          <Route path="/settings"       element={<Settings />} />
-        </Routes>
-      </div>
-      <BottomNav />
-    </BrowserRouter>
+    <>
+      {!isOnline && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-red-900 text-white text-sm text-center py-2">
+          You're offline — showing cached data
+        </div>
+      )}
+      <BrowserRouter>
+        <div style={{ paddingBottom: 70 }}>
+          <Routes>
+            <Route path="/"               element={<HomeScreen />} />
+            <Route path="/river/:riverId" element={<RiverDetail />} />
+            <Route path="/hatches"        element={<HatchCalendar />} />
+            <Route path="/settings"       element={<Settings />} />
+          </Routes>
+        </div>
+        <BottomNav />
+      </BrowserRouter>
+    </>
   )
 }

@@ -23,7 +23,7 @@ function PatternSection({ title, patterns, open, onToggle }) {
     <div>
       <button
         onClick={onToggle}
-        className="flex items-center gap-1 w-full text-left py-1.5 min-h-[36px]"
+        className="flex items-center gap-1 w-full text-left py-1.5 min-h-[44px]"
       >
         <ChevronRight
           size={14}
