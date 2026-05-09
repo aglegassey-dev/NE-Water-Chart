@@ -1,14 +1,19 @@
-export const formatCFS = (cfs, unit = 'cfs') => {
+const getFlowUnit = () => localStorage.getItem('hatchwatch_units_flow') ?? 'cfs'
+const getTempUnit = () => localStorage.getItem('hatchwatch_units_temp') ?? 'f'
+
+export const formatCFS = (cfs, unit) => {
   if (cfs === null || cfs === undefined) return '—'
-  if (unit === 'cms') {
+  const u = unit ?? getFlowUnit()
+  if (u === 'cms') {
     return `${(cfs * 0.0283168).toFixed(2)} m³/s`
   }
   return `${Math.round(cfs).toLocaleString()} cfs`
 }
 
-export const formatTemp = (tempF, unit = 'f') => {
+export const formatTemp = (tempF, unit) => {
   if (tempF === null || tempF === undefined) return '—'
-  if (unit === 'c') {
+  const u = unit ?? getTempUnit()
+  if (u === 'c') {
     return `${((tempF - 32) * 5 / 9).toFixed(1)}°C`
   }
   return `${Math.round(tempF)}°F`

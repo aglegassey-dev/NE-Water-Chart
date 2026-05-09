@@ -6,28 +6,20 @@ import { useQueries, useQueryClient } from '@tanstack/react-query'
 import rivers from '../data/rivers'
 import { getActiveHatches } from '../data/hatches'
 import { fetchStreamflow } from '../hooks/useStreamflow'
+import { useFavorites } from '../hooks/useFavorites'
 import { getFlowStatus } from '../utils/flowStatus'
 import RiverCard from '../components/RiverCard'
 import StateFilterBar from '../components/StateFilterBar'
 
 const currentMonth = new Date().getMonth() + 1
 
-const readFavorites = () => {
-  try {
-    return JSON.parse(localStorage.getItem('hatchwatch_favorites') ?? '[]')
-  } catch {
-    return []
-  }
-}
-
 export default function HomeScreen() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [activeState, setActiveState] = useState('All')
   const [showFavorites, setShowFavorites] = useState(false)
-  const [favorites] = useState(readFavorites)
+  const { favorites, toggleFavorite } = useFavorites()
 
-  // Fetch all streamflow for the conditions banner (shares cache with RiverCards)
   const flowResults = useQueries({
     queries: rivers.map(r => ({
       queryKey: ['streamflow', r.usgsStationId],
@@ -56,21 +48,20 @@ export default function HomeScreen() {
       {/* Header */}
       <header className="bg-olive-900 sticky top-0 z-20 px-4 h-14 flex items-center justify-between">
         <h1 className="font-river text-amber text-xl">HatchWatch</h1>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-1">
           <button
             onClick={() => setShowFavorites(f => !f)}
-            className="p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label="Toggle favorites"
           >
             <Heart
               size={20}
-              fill={showFavorites ? 'currentColor' : 'none'}
-              className="text-amber"
+              className={showFavorites ? 'fill-amber text-amber' : 'fill-none text-slate-muted'}
             />
           </button>
           <Link
             to="/settings"
-            className="p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <Settings size={20} className="text-slate-muted" />
           </Link>
@@ -82,11 +73,11 @@ export default function HomeScreen() {
 
       {/* Conditions banner */}
       <div className="bg-olive-700 mx-4 my-2 rounded-lg p-3 flex flex-col gap-1">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-teal font-semibold text-sm">
-            {idealCount > 0 ? `${idealCount} river${idealCount === 1 ? '' : 's'} in ideal condition` : 'Checking conditions…'}
-          </span>
-        </div>
+        <span className="text-teal font-semibold text-sm">
+          {idealCount > 0
+            ? `${idealCount} river${idealCount === 1 ? '' : 's'} in ideal condition`
+            : 'Checking conditions…'}
+        </span>
         {firstHatch && (
           <span className="text-slate-muted text-xs">
             Active hatch: <span className="text-white">{firstHatch.commonName}</span>
@@ -100,7 +91,7 @@ export default function HomeScreen() {
           <span className="text-slate-muted text-xs">{filtered.length} rivers</span>
           <button
             onClick={handleRefresh}
-            className="flex items-center gap-1 text-slate-muted text-xs p-1 min-h-[44px]"
+            className="flex items-center gap-1 text-slate-muted text-xs min-h-[44px] px-2"
           >
             <RefreshCw size={14} />
             Refresh
@@ -109,10 +100,12 @@ export default function HomeScreen() {
 
         {showFavorites && favorites.length === 0 ? (
           <p className="text-slate-muted text-sm text-center py-8">
-            No favorites saved yet. Visit a river detail to add favorites.
+            Tap the heart on any river card to save favorites.
           </p>
         ) : filtered.length === 0 ? (
-          <p className="text-slate-muted text-sm text-center py-8">No rivers match this filter.</p>
+          <p className="text-slate-muted text-sm text-center py-8">
+            No rivers match this filter.
+          </p>
         ) : (
           <div className="space-y-3">
             {filtered.map(river => (
@@ -120,6 +113,8 @@ export default function HomeScreen() {
                 key={river.id}
                 river={river}
                 onTap={() => navigate(`/river/${river.id}`)}
+                isFavorited={favorites.includes(river.id)}
+                onToggleFavorite={toggleFavorite}
               />
             ))}
           </div>

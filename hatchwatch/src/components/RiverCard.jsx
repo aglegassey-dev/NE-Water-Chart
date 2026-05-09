@@ -1,15 +1,20 @@
-import { ChevronRight, RefreshCw } from 'lucide-react'
+import { ChevronRight, RefreshCw, Heart } from 'lucide-react'
 import { useStreamflow } from '../hooks/useStreamflow'
 import { useWeather } from '../hooks/useWeather'
 import { getFlowStatus } from '../utils/flowStatus'
 import { formatCFS, formatTemp } from '../utils/formatters'
 import WeatherStrip from './WeatherStrip'
 
-export default function RiverCard({ river, onTap }) {
+export default function RiverCard({ river, onTap, isFavorited, onToggleFavorite }) {
   const { cfs, gaugeHeight, waterTempF, isLoading, isError, refetch } =
     useStreamflow(river.usgsStationId)
   const { tempF, windMph, windDirection, cloudCoverPct, precipMm } =
     useWeather(river.lat, river.lng)
+
+  const handleHeartClick = (e) => {
+    e.stopPropagation()
+    onToggleFavorite?.(river.id)
+  }
 
   if (isLoading) {
     return (
@@ -26,7 +31,7 @@ export default function RiverCard({ river, onTap }) {
         <span className="text-slate-muted text-sm flex-1">Flow data unavailable</span>
         <button
           onClick={(e) => { e.stopPropagation(); refetch() }}
-          className="text-slate-muted p-1"
+          className="text-slate-muted p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
           aria-label="Retry"
         >
           <RefreshCw size={16} />
@@ -43,16 +48,27 @@ export default function RiverCard({ river, onTap }) {
       className="w-full bg-olive-800 rounded-xl p-4 text-left min-h-[44px] flex flex-col gap-2"
     >
       {/* Top row */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="font-river text-white text-base leading-snug">{river.name}</span>
-        <span className="text-slate-muted text-xs">– {river.section}</span>
-        <span className="bg-olive-700 text-slate-muted text-xs px-2 py-0.5 rounded">
+      <div className="flex items-center gap-2">
+        <span className="font-river text-white text-base leading-snug flex-1 min-w-0 truncate">
+          {river.name}
+        </span>
+        <span className="bg-olive-700 text-slate-muted text-xs px-2 py-0.5 rounded flex-shrink-0">
           {river.state}
         </span>
         {river.flyFishingOnly && (
-          <span className="text-amber text-xs font-medium">🎣 FFO</span>
+          <span className="text-amber text-xs font-medium flex-shrink-0">🎣 FFO</span>
         )}
-        <span className="ml-auto w-2 h-2 rounded-full bg-teal animate-pulse flex-shrink-0" />
+        <button
+          onClick={handleHeartClick}
+          className="flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2"
+          aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+        >
+          <Heart
+            size={18}
+            className={isFavorited ? 'fill-amber text-amber' : 'fill-none text-slate-muted'}
+          />
+        </button>
+        <span className="w-2 h-2 rounded-full bg-teal animate-pulse flex-shrink-0" />
       </div>
 
       {/* Middle row */}
