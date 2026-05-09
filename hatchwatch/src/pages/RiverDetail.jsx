@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ExternalLink } from 'lucide-react'
 
@@ -6,6 +5,7 @@ import { getRiverById } from '../data/rivers'
 import { getActiveHatches } from '../data/hatches'
 import { useStreamflow } from '../hooks/useStreamflow'
 import { useWeather } from '../hooks/useWeather'
+import { useFlowHistory } from '../hooks/useFlowHistory'
 import { getFlowStatus } from '../utils/flowStatus'
 import { formatCFS, formatTemp, formatLastUpdated } from '../utils/formatters'
 import WeatherStrip from '../components/WeatherStrip'
@@ -23,15 +23,8 @@ export default function RiverDetail() {
     useStreamflow(river?.usgsStationId)
   const { tempF, windMph, windDirection, cloudCoverPct, precipMm } =
     useWeather(river?.lat, river?.lng)
-
-  const mockSparkData = useMemo(
-    () =>
-      Array.from({ length: 7 }, (_, i) => ({
-        date: new Date(Date.now() - (6 - i) * 86400000).toLocaleDateString(),
-        cfs: 300 + Math.sin(i) * 100 + Math.random() * 50,
-      })),
-    []
-  )
+  const { history: sparkData, isLoading: sparkLoading } =
+    useFlowHistory(river?.usgsStationId)
 
   if (!river) {
     return (
@@ -134,10 +127,14 @@ export default function RiverDetail() {
           )}
 
           {/* Sparkline */}
-          <div className="pt-1">
-            <p className="text-slate-muted text-xs mb-1">7-day trend</p>
-            <FlowSparkline data={mockSparkData} />
-          </div>
+          {sparkLoading ? (
+            <div className="bg-olive-700 animate-pulse rounded h-10 w-[120px] mt-1" />
+          ) : sparkData.length > 0 ? (
+            <div className="pt-1">
+              <p className="text-slate-muted text-xs mb-1">7-day trend</p>
+              <FlowSparkline data={sparkData} />
+            </div>
+          ) : null}
         </div>
 
         {/* Species */}
