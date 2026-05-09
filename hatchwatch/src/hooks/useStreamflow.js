@@ -19,14 +19,13 @@ const latestDateTime = (series) => {
   return dt ? new Date(dt) : null
 }
 
-const fetchStreamflow = async (stationId) => {
+export const fetchStreamflow = async (stationId) => {
   const url = `${USGS_BASE}?format=json&sites=${stationId}&parameterCd=00060,00065,00010&siteStatus=active`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`USGS fetch failed: ${res.status}`)
   const json = await res.json()
 
   const timeSeries = json?.value?.timeSeries ?? []
-
   const dischargeSeries = findSeries(timeSeries, '00060')
   const gaugeSeries     = findSeries(timeSeries, '00065')
   const tempSeries      = findSeries(timeSeries, '00010')
@@ -41,7 +40,7 @@ const fetchStreamflow = async (stationId) => {
 }
 
 export const useStreamflow = (stationId) => {
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['streamflow', stationId],
     queryFn: () => fetchStreamflow(stationId),
     staleTime: 1000 * 60 * 60,
@@ -55,5 +54,6 @@ export const useStreamflow = (stationId) => {
     lastUpdated: data?.lastUpdated ?? null,
     isLoading,
     isError,
+    refetch,
   }
 }
