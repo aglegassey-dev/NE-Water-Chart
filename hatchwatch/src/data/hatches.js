@@ -1,0 +1,318 @@
+const hatches = [
+  {
+    id: 'bwo',
+    commonName: 'Blue-Winged Olive',
+    latinName: 'Baetis tricaudatus',
+    type: 'mayfly',
+    peakMonths: [4, 5, 9, 10],
+    waterTempMinF: 45,
+    waterTempMaxF: 55,
+    timeOfDay: 'morning',
+    states: ['ME', 'NH', 'VT'],
+    notes: 'Most reliable hatch in the Northeast; overcast days trigger the heaviest activity.',
+    patterns: {
+      nymph: [
+        { name: 'Pheasant Tail', sizes: '#18-20', notes: 'dead-drift near bottom' },
+        { name: 'Sparkle Dun Nymph', sizes: '#18', notes: 'in the film during emergence' },
+      ],
+      dry: [
+        { name: 'Parachute BWO', sizes: '#18-20', notes: 'best all-around dry' },
+        { name: 'CDC BWO', sizes: '#18', notes: 'flat-water spring creeks' },
+        { name: 'Comparadun BWO', sizes: '#18', notes: 'faster riffles' },
+      ],
+      wet: [
+        { name: 'Soft Hackle Hare\'s Ear', sizes: '#18', notes: 'swing through runs during emergence' },
+      ],
+      streamer: [],
+    },
+  },
+  {
+    id: 'hendrickson',
+    commonName: 'Hendrickson',
+    latinName: 'Ephemerella subvaria',
+    type: 'mayfly',
+    peakMonths: [4, 5],
+    waterTempMinF: 48,
+    waterTempMaxF: 55,
+    timeOfDay: 'afternoon',
+    states: ['ME', 'NH', 'VT'],
+    notes: 'The Northeast\'s first major mayfly hatch; fish get selective fast.',
+    patterns: {
+      nymph: [
+        { name: 'Hare\'s Ear', sizes: '#14', notes: 'before hatch' },
+        { name: 'Red Fox Squirrel Nymph', sizes: '#14', notes: 'pre-hatch crawler' },
+      ],
+      dry: [
+        { name: 'Parachute Hendrickson', sizes: '#14', notes: 'reliable in all water types' },
+        { name: 'Red Quill', sizes: '#14', notes: 'spinner fall' },
+        { name: 'Comparadun Hendrickson', sizes: '#14', notes: 'flat water' },
+      ],
+      wet: [
+        { name: 'Wet Hendrickson', sizes: '#14', notes: 'swing during hatch' },
+        { name: 'Soft Hackle Partridge', sizes: '#14', notes: 'just under surface' },
+      ],
+      streamer: [],
+    },
+  },
+  {
+    id: 'march-brown',
+    commonName: 'March Brown',
+    latinName: 'Maccaffertium vicarium',
+    type: 'mayfly',
+    peakMonths: [5, 6],
+    waterTempMinF: 52,
+    waterTempMaxF: 62,
+    timeOfDay: 'afternoon',
+    states: ['ME', 'NH', 'VT'],
+    notes: 'Large naturals; fish often prefer the nymph and emerger over the adult.',
+    patterns: {
+      nymph: [
+        { name: 'March Brown Nymph', sizes: '#12', notes: 'dead-drift bouldered runs' },
+        { name: 'Hare\'s Ear', sizes: '#12', notes: 'general pre-hatch' },
+      ],
+      dry: [
+        { name: 'March Brown Comparadun', sizes: '#12', notes: 'flush in surface film' },
+        { name: 'Parachute March Brown', sizes: '#12', notes: 'broken water' },
+      ],
+      wet: [
+        { name: 'March Brown Wet', sizes: '#12', notes: 'swing below riffles' },
+        { name: 'Soft Hackle Pheasant Tail', sizes: '#12', notes: 'during emergence' },
+      ],
+      streamer: [],
+    },
+  },
+  {
+    id: 'green-caddis',
+    commonName: 'Green Caddis',
+    latinName: 'Rhyacophila',
+    type: 'caddis',
+    peakMonths: [5, 6, 7],
+    waterTempMinF: 55,
+    waterTempMaxF: 65,
+    timeOfDay: 'evening',
+    states: ['ME', 'NH', 'VT'],
+    notes: 'Free-living caddis; larvae highly imitative; adults skitter on surface.',
+    patterns: {
+      nymph: [
+        { name: 'Green Caddis Larva', sizes: '#14-16', notes: 'dead-drift or swing' },
+        { name: 'Peking Caddis', sizes: '#14', notes: 'attractor pattern' },
+      ],
+      dry: [
+        { name: 'Elk Hair Caddis', sizes: '#14-16', notes: 'most versatile' },
+        { name: 'X-Caddis', sizes: '#14', notes: 'emerger stage' },
+        { name: 'CDC Caddis', sizes: '#14', notes: 'slow flat water' },
+      ],
+      wet: [
+        { name: 'Soft Hackle Green', sizes: '#14', notes: 'swing at dusk' },
+        { name: 'LaFontaine Sparkle Pupa', sizes: '#14', notes: 'emerging pupae' },
+      ],
+      streamer: [],
+    },
+  },
+  {
+    id: 'sulphur-pmd',
+    commonName: 'Sulphur / PMD',
+    latinName: 'Ephemerella dorothea',
+    type: 'mayfly',
+    peakMonths: [6, 7],
+    waterTempMinF: 58,
+    waterTempMaxF: 68,
+    timeOfDay: 'evening',
+    states: ['ME', 'NH', 'VT'],
+    notes: 'Classic evening hatch; spinner falls after dark can be spectacular.',
+    patterns: {
+      nymph: [
+        { name: 'Sulphur Nymph', sizes: '#16', notes: 'pre-hatch' },
+        { name: 'Hare\'s Ear', sizes: '#16', notes: 'general attractor' },
+      ],
+      dry: [
+        { name: 'Parachute Sulphur', sizes: '#16', notes: 'broken water' },
+        { name: 'Comparadun Sulphur', sizes: '#16', notes: 'flat water' },
+        { name: 'CDC Sulphur Emerger', sizes: '#16', notes: 'in the film' },
+      ],
+      wet: [
+        { name: 'Soft Hackle Sulphur', sizes: '#16', notes: 'swing at last light' },
+      ],
+      streamer: [],
+    },
+  },
+  {
+    id: 'yellow-stonefly',
+    commonName: 'Yellow Stonefly',
+    latinName: 'Isoperla',
+    type: 'stonefly',
+    peakMonths: [6, 7],
+    waterTempMinF: 58,
+    waterTempMaxF: 65,
+    timeOfDay: 'all-day',
+    states: ['ME', 'NH', 'VT'],
+    notes: 'Adults lay eggs all day; fish look up throughout daylight hours.',
+    patterns: {
+      nymph: [
+        { name: 'Golden Stone Nymph', sizes: '#10-12', notes: 'bounce bottom in runs' },
+        { name: 'Kaufmann\'s Stone', sizes: '#10', notes: 'larger water' },
+      ],
+      dry: [
+        { name: 'Stimulator Yellow', sizes: '#10-12', notes: 'attractor, covers stonefly and caddis' },
+        { name: 'Elk Hair Yellow Stone', sizes: '#10', notes: 'flats and pools' },
+      ],
+      wet: [],
+      streamer: [],
+    },
+  },
+  {
+    id: 'trico',
+    commonName: 'Trico',
+    latinName: 'Tricorythodes',
+    type: 'mayfly',
+    peakMonths: [7, 8],
+    waterTempMinF: 62,
+    waterTempMaxF: 72,
+    timeOfDay: 'morning',
+    states: ['ME', 'NH', 'VT'],
+    notes: 'Tiny flies, huge spinner falls; summer mornings only; demanding fishing.',
+    patterns: {
+      nymph: [
+        { name: 'Trico Nymph', sizes: '#22-24', notes: 'tiny dead-drift' },
+      ],
+      dry: [
+        { name: 'Trico Spinner', sizes: '#22-24', notes: 'flush in surface film' },
+        { name: 'Cluster Trico', sizes: '#22', notes: 'multiple spinners grouped' },
+      ],
+      wet: [],
+      streamer: [],
+    },
+  },
+  {
+    id: 'mahogany-dun',
+    commonName: 'Mahogany Dun',
+    latinName: 'Paraleptophlebia',
+    type: 'mayfly',
+    peakMonths: [8, 9],
+    waterTempMinF: 58,
+    waterTempMaxF: 65,
+    timeOfDay: 'afternoon',
+    states: ['ME', 'NH', 'VT'],
+    notes: 'Late summer hatch signals the transition to fall; underrated and often ignored.',
+    patterns: {
+      nymph: [
+        { name: 'Pheasant Tail', sizes: '#16', notes: 'dead-drift' },
+        { name: 'Mahogany Nymph', sizes: '#16', notes: 'specific imitation' },
+      ],
+      dry: [
+        { name: 'Mahogany Dun', sizes: '#16', notes: 'direct imitation' },
+        { name: 'Comparadun Mahogany', sizes: '#16', notes: 'flat water' },
+      ],
+      wet: [
+        { name: 'Soft Hackle Pheasant Tail', sizes: '#16', notes: 'swing downstream' },
+      ],
+      streamer: [],
+    },
+  },
+  {
+    id: 'isonychia',
+    commonName: 'Isonychia / Slate Drake',
+    latinName: 'Isonychia bicolor',
+    type: 'mayfly',
+    peakMonths: [9, 10],
+    waterTempMinF: 52,
+    waterTempMaxF: 60,
+    timeOfDay: 'evening',
+    states: ['ME', 'NH', 'VT'],
+    notes: 'Fast-swimming nymphs; fish key on the nymph and drown emerger; one of fall\'s best hatches.',
+    patterns: {
+      nymph: [
+        { name: 'Isonychia Nymph', sizes: '#12', notes: 'swing or dead-drift' },
+        { name: 'Leadwing Coachman Nymph', sizes: '#12', notes: 'classic wet-fly approach' },
+      ],
+      dry: [
+        { name: 'Paradrake Isonychia', sizes: '#12', notes: 'broken water adult' },
+        { name: 'Comparadun Isonychia', sizes: '#12', notes: 'smooth water' },
+      ],
+      wet: [
+        { name: 'Leadwing Coachman Wet', sizes: '#12', notes: 'classic swing' },
+        { name: 'Soft Hackle', sizes: '#12', notes: 'emerging' },
+      ],
+      streamer: [],
+    },
+  },
+  {
+    id: 'terrestrials',
+    commonName: 'Terrestrials',
+    latinName: 'Ants, Beetles, Hoppers',
+    type: 'terrestrial',
+    peakMonths: [7, 8, 9],
+    waterTempMinF: 65,
+    waterTempMaxF: 75,
+    timeOfDay: 'all-day',
+    states: ['ME', 'NH', 'VT'],
+    notes: 'Windy summer days and overhanging banks; fish actively look up.',
+    patterns: {
+      nymph: [],
+      dry: [
+        { name: 'Chernobyl Ant', sizes: '#14', notes: 'foam banks' },
+        { name: 'Black Foam Beetle', sizes: '#14', notes: 'slow flats' },
+        { name: 'Dave\'s Hopper', sizes: '#10-12', notes: 'meadow sections' },
+        { name: 'Parachute Hopper', sizes: '#10', notes: 'attractor' },
+      ],
+      wet: [],
+      streamer: [],
+    },
+  },
+  {
+    id: 'smelt-run',
+    commonName: 'Early Season Smelt Run',
+    latinName: 'Osmerus mordax',
+    type: 'baitfish',
+    peakMonths: [4, 5],
+    waterTempMinF: 32,
+    waterTempMaxF: 50,
+    timeOfDay: 'all-day',
+    states: ['ME', 'NH', 'VT'],
+    notes: 'Salmon and large browns chase smelt in cold spring water; streamers outfish all other patterns.',
+    patterns: {
+      nymph: [],
+      dry: [],
+      wet: [],
+      streamer: [
+        { name: 'Gray Ghost', sizes: '#4-6', notes: 'classic smelt imitation' },
+        { name: 'Black Ghost', sizes: '#4-6', notes: 'darker water' },
+        { name: 'Supervisor', sizes: '#4-6', notes: 'bright conditions' },
+        { name: 'Nine-Three', sizes: '#4', notes: 'large smelt imitation' },
+      ],
+    },
+  },
+  {
+    id: 'general-streamer',
+    commonName: 'General Streamer Season',
+    latinName: 'Various baitfish',
+    type: 'baitfish',
+    peakMonths: [4, 5, 6, 9, 10],
+    waterTempMinF: 32,
+    waterTempMaxF: 58,
+    timeOfDay: 'all-day',
+    states: ['ME', 'NH', 'VT'],
+    notes: 'Cold water triggers aggressive predatory behavior; large profiles move the biggest fish.',
+    patterns: {
+      nymph: [],
+      dry: [],
+      wet: [],
+      streamer: [
+        { name: 'Woolly Bugger Olive', sizes: '#6-8', notes: 'all-around producer' },
+        { name: 'Muddler Minnow', sizes: '#6', notes: 'sculpin imitation' },
+        { name: 'Sculpin Clouser', sizes: '#4', notes: 'deep runs' },
+        { name: 'Senyo\'s Ice Man Minnow', sizes: '#4', notes: 'clear water' },
+        { name: 'Mickey Finn', sizes: '#6', notes: 'attractor' },
+        { name: 'Double Bunny', sizes: '#2-4', notes: 'trophy water' },
+      ],
+    },
+  },
+]
+
+export default hatches
+
+export const getActiveHatches = (monthNumber, waterTempF = null) =>
+  hatches.filter(h =>
+    h.peakMonths.includes(monthNumber) &&
+    (waterTempF === null || (waterTempF >= h.waterTempMinF && waterTempF <= h.waterTempMaxF))
+  )
