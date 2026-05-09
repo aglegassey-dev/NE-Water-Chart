@@ -32,7 +32,7 @@ export default function RiverDetail() {
         <p className="text-slate-muted">River not found.</p>
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-amber"
+          className="flex items-center gap-2 text-amber focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
         >
           <ArrowLeft size={16} /> Back to Rivers
         </button>
@@ -45,11 +45,12 @@ export default function RiverDetail() {
 
   return (
     <div>
-      {/* Header */}
-      <header className="bg-olive-900 sticky top-0 z-20 px-4 h-14 flex items-center gap-3">
+      {/* Header — full width on all breakpoints */}
+      <header className="bg-olive-900 sticky top-0 z-20 px-4 h-14 flex items-center gap-3 md:px-6">
         <button
           onClick={() => navigate('/')}
-          className="p-1 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-muted"
+          className="p-1 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-muted
+            hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-1 focus-visible:ring-offset-olive-900"
           aria-label="Back"
         >
           <ArrowLeft size={20} />
@@ -63,100 +64,116 @@ export default function RiverDetail() {
         )}
       </header>
 
-      <div className="px-4 py-4 space-y-5">
-        {/* Weather strip */}
-        <div className="bg-olive-800 rounded-xl p-3">
-          <WeatherStrip
-            tempF={tempF}
-            windMph={windMph}
-            windDirection={windDirection}
-            cloudCoverPct={cloudCoverPct}
-            precipMm={precipMm}
-          />
-        </div>
+      {/* Two-column grid on desktop */}
+      <div className="md:grid md:grid-cols-[1fr_380px] md:gap-6 md:items-start px-4 md:px-6 py-4">
 
-        {/* CFS display */}
-        <div className="bg-olive-800 rounded-xl p-4 space-y-3">
-          {isLoading ? (
-            <div className="space-y-2">
-              <div className="bg-olive-700 animate-pulse rounded h-12 w-2/5" />
-              <div className="bg-olive-700 animate-pulse rounded h-4 w-3/5" />
-            </div>
-          ) : isError ? (
-            <p className="text-slate-muted">Flow data unavailable for this station.</p>
-          ) : (
-            <>
-              <div className="flex items-end gap-3 flex-wrap">
-                <span
-                  className="text-5xl font-bold leading-none"
-                  style={{ color: flowStatus?.color ?? '#94A3B8' }}
-                >
-                  {formatCFS(cfs)}
-                </span>
-                {flowStatus && (
-                  <span
-                    className="text-sm px-3 py-1 rounded-full font-medium mb-1"
-                    style={{ backgroundColor: flowStatus.color + '33', color: flowStatus.color }}
-                  >
-                    {flowStatus.label}
-                  </span>
-                )}
-              </div>
-
-              {flowStatus && (
-                <p className="text-slate-muted text-sm">{flowStatus.description}</p>
-              )}
-
-              <div className="flex items-center gap-4 flex-wrap text-sm">
-                {gaugeHeight !== null && (
-                  <span className="text-slate-muted">
-                    Gauge: <span className="text-white">{gaugeHeight.toFixed(2)} ft</span>
-                  </span>
-                )}
-                {waterTempF !== null && (
-                  <span className="text-slate-muted">
-                    Water: <span className="text-teal">{formatTemp(waterTempF)}</span>
-                  </span>
-                )}
-              </div>
-
-              {lastUpdated && (
-                <p className="text-slate-muted text-xs">{formatLastUpdated(lastUpdated)}</p>
-              )}
-            </>
-          )}
-
-          {/* Sparkline */}
-          {sparkLoading ? (
-            <div className="bg-olive-700 animate-pulse rounded h-10 w-[120px] mt-1" />
-          ) : sparkData.length > 0 ? (
-            <div className="pt-1">
-              <p className="text-slate-muted text-xs mb-1">7-day trend</p>
-              <FlowSparkline data={sparkData} />
-            </div>
-          ) : null}
-        </div>
-
-        {/* Species */}
-        <div>
-          <h2 className="text-slate-muted text-xs uppercase tracking-wider mb-2">Target Species</h2>
-          <div className="flex flex-wrap gap-2">
-            {river.targetSpecies.map(s => (
-              <span key={s} className="bg-olive-700 rounded-full px-3 py-1 text-sm text-white">
-                {s}
-              </span>
-            ))}
+        {/* Left column */}
+        <div className="space-y-4">
+          {/* Weather strip */}
+          <div className="bg-olive-800 rounded-xl p-3">
+            <WeatherStrip
+              tempF={tempF}
+              windMph={windMph}
+              windDirection={windDirection}
+              cloudCoverPct={cloudCoverPct}
+              precipMm={precipMm}
+            />
           </div>
+
+          {/* CFS display + sparkline */}
+          <div className="bg-olive-800 rounded-xl p-4 space-y-3">
+            {isLoading ? (
+              <div className="space-y-2">
+                <div className="bg-olive-700 animate-pulse rounded h-12 w-2/5" />
+                <div className="bg-olive-700 animate-pulse rounded h-4 w-3/5" />
+              </div>
+            ) : isError ? (
+              <p className="text-slate-muted">Flow data unavailable for this station.</p>
+            ) : (
+              <>
+                <div className="flex items-end gap-3 flex-wrap">
+                  <span
+                    className="text-5xl font-bold leading-none"
+                    style={{ color: flowStatus?.color ?? '#94A3B8' }}
+                  >
+                    {formatCFS(cfs)}
+                  </span>
+                  {flowStatus && (
+                    <span
+                      className="text-sm px-3 py-1 rounded-full font-medium mb-1"
+                      style={{ backgroundColor: flowStatus.color + '33', color: flowStatus.color }}
+                    >
+                      {flowStatus.label}
+                    </span>
+                  )}
+                </div>
+
+                {flowStatus && (
+                  <p className="text-slate-muted text-sm">{flowStatus.description}</p>
+                )}
+
+                <div className="flex items-center gap-4 flex-wrap text-sm">
+                  {gaugeHeight !== null && (
+                    <span className="text-slate-muted">
+                      Gauge: <span className="text-white">{gaugeHeight.toFixed(2)} ft</span>
+                    </span>
+                  )}
+                  {waterTempF !== null && (
+                    <span className="text-slate-muted">
+                      Water: <span className="text-teal">{formatTemp(waterTempF)}</span>
+                    </span>
+                  )}
+                </div>
+
+                {lastUpdated && (
+                  <p className="text-slate-muted text-xs">{formatLastUpdated(lastUpdated)}</p>
+                )}
+              </>
+            )}
+
+            {sparkLoading ? (
+              <div className="bg-olive-700 animate-pulse rounded h-10 w-[120px] mt-1" />
+            ) : sparkData.length > 0 ? (
+              <div className="pt-1">
+                <p className="text-slate-muted text-xs mb-1">7-day trend</p>
+                <FlowSparkline data={sparkData} />
+              </div>
+            ) : null}
+          </div>
+
+          {/* Species */}
+          <div>
+            <h2 className="text-slate-muted text-xs uppercase tracking-wider mb-2">
+              Target Species
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {river.targetSpecies.map(s => (
+                <span key={s} className="bg-olive-700 rounded-full px-3 py-1 text-sm text-white">
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Notes */}
+          <p className="text-slate-muted italic text-sm leading-relaxed">{river.notes}</p>
+
+          {/* USGS link */}
+          <a
+            href={`https://waterdata.usgs.gov/monitoring-location/${river.usgsStationId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-teal text-sm py-3 border border-olive-700 rounded-xl justify-center
+              hover:border-teal hover:bg-olive-800 transition-colors
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
+          >
+            View on USGS <ExternalLink size={14} />
+          </a>
         </div>
 
-        {/* Notes */}
-        <p className="text-slate-muted italic text-sm leading-relaxed">{river.notes}</p>
-
-        {/* Active hatches */}
-        <div>
-          <h2 className="text-slate-muted text-xs uppercase tracking-wider mb-3">
-            Active Hatches This Month
-          </h2>
+        {/* Right column — hatches (stacks below on mobile, beside on desktop) */}
+        <div className="mt-6 md:mt-0">
+          <h2 className="font-river text-lg text-white mb-3">Active Hatches</h2>
           {activeHatches.length === 0 ? (
             <p className="text-slate-muted text-sm">No active hatches this month.</p>
           ) : (
@@ -168,15 +185,6 @@ export default function RiverDetail() {
           )}
         </div>
 
-        {/* USGS link */}
-        <a
-          href={`https://waterdata.usgs.gov/monitoring-location/${river.usgsStationId}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 text-teal text-sm py-3 border border-olive-700 rounded-xl justify-center"
-        >
-          View on USGS <ExternalLink size={14} />
-        </a>
       </div>
     </div>
   )

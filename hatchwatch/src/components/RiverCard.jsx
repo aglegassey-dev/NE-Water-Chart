@@ -31,7 +31,9 @@ export default function RiverCard({ river, onTap, isFavorited, onToggleFavorite 
         <span className="text-slate-muted text-sm flex-1">Flow data unavailable</span>
         <button
           onClick={(e) => { e.stopPropagation(); refetch() }}
-          className="text-slate-muted p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+          className="text-slate-muted p-1 min-h-[44px] min-w-[44px] flex items-center justify-center
+            hover:text-white transition-colors
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-1 focus-visible:ring-offset-olive-900"
           aria-label="Retry"
         >
           <RefreshCw size={16} />
@@ -45,7 +47,9 @@ export default function RiverCard({ river, onTap, isFavorited, onToggleFavorite 
   return (
     <button
       onClick={onTap}
-      className="w-full bg-olive-800 rounded-xl p-4 text-left min-h-[44px] flex flex-col gap-2"
+      className="w-full bg-olive-800 rounded-xl p-4 text-left min-h-[44px] flex flex-col gap-2
+        hover:bg-olive-700 transition-colors duration-150
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
     >
       {/* Top row */}
       <div className="flex items-center gap-2">
@@ -60,7 +64,9 @@ export default function RiverCard({ river, onTap, isFavorited, onToggleFavorite 
         )}
         <button
           onClick={handleHeartClick}
-          className="flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2"
+          className="flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2
+            hover:scale-110 transition-transform
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-1 focus-visible:ring-offset-olive-800"
           aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
         >
           <Heart

@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { ChevronRight } from 'lucide-react'
 
 const TYPE_EMOJI = {
-  caddis:     '🪲',
-  mayfly:     '🦋',
-  stonefly:   '🪨',
-  midge:      '🦟',
-  terrestrial:'🌿',
-  baitfish:   '🐟',
+  caddis:      '🪲',
+  mayfly:      '🦋',
+  stonefly:    '🪨',
+  midge:       '🦟',
+  terrestrial: '🌿',
+  baitfish:    '🐟',
 }
 
 const TIME_LABELS = {
@@ -23,7 +23,9 @@ function PatternSection({ title, patterns, open, onToggle }) {
     <div>
       <button
         onClick={onToggle}
-        className="flex items-center gap-1 w-full text-left py-1.5 min-h-[44px]"
+        className="flex items-center gap-1 w-full text-left py-1.5 min-h-[44px]
+          hover:text-white transition-colors duration-150
+          focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-teal"
       >
         <ChevronRight
           size={14}

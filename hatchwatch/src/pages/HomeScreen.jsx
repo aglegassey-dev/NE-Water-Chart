@@ -45,13 +45,14 @@ export default function HomeScreen() {
 
   return (
     <div>
-      {/* Header */}
-      <header className="bg-olive-900 sticky top-0 z-20 px-4 h-14 flex items-center justify-between">
+      {/* Header — md:pl-6 for extra breathing room beside sidebar */}
+      <header className="bg-olive-900 sticky top-0 z-20 px-4 h-14 flex items-center justify-between md:pl-6">
         <h1 className="font-river text-amber text-xl">HatchWatch</h1>
         <div className="flex items-center gap-1">
           <button
             onClick={() => setShowFavorites(f => !f)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-1 focus-visible:ring-offset-olive-900"
             aria-label="Toggle favorites"
           >
             <Heart
@@ -61,7 +62,8 @@ export default function HomeScreen() {
           </button>
           <Link
             to="/settings"
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center md:hidden
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-1 focus-visible:ring-offset-olive-900"
           >
             <Settings size={20} className="text-slate-muted" />
           </Link>
@@ -72,7 +74,7 @@ export default function HomeScreen() {
       <StateFilterBar activeState={activeState} onStateChange={setActiveState} />
 
       {/* Conditions banner */}
-      <div className="bg-olive-700 mx-4 my-2 rounded-lg p-3 flex flex-col gap-1">
+      <div className="bg-olive-700 mx-4 my-2 rounded-lg p-3 flex flex-col gap-1 md:mx-6">
         <span className="text-teal font-semibold text-sm">
           {idealCount > 0
             ? `${idealCount} river${idealCount === 1 ? '' : 's'} in ideal condition`
@@ -86,12 +88,13 @@ export default function HomeScreen() {
       </div>
 
       {/* River list */}
-      <div className="px-4 pb-4">
+      <div className="px-4 pb-4 md:px-6">
         <div className="flex items-center justify-between mb-2">
           <span className="text-slate-muted text-xs">{filtered.length} rivers</span>
           <button
             onClick={handleRefresh}
-            className="flex items-center gap-1 text-slate-muted text-xs min-h-[44px] px-2"
+            className="flex items-center gap-1 text-slate-muted text-xs min-h-[44px] px-2
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-1 focus-visible:ring-offset-olive-900"
           >
             <RefreshCw size={14} />
             Refresh
@@ -107,7 +110,7 @@ export default function HomeScreen() {
             No rivers match this filter.
           </p>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             {filtered.map(river => (
               <RiverCard
                 key={river.id}

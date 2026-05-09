@@ -5,6 +5,8 @@ import { useFavorites } from '../hooks/useFavorites'
 import { getRiverById } from '../data/rivers'
 import { formatCFS, formatTemp, formatLastUpdated } from '../utils/formatters'
 
+const RING = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-1 focus-visible:ring-offset-olive-900'
+
 const SectionHeading = ({ children }) => (
   <p className="text-slate-muted text-xs uppercase tracking-wider mb-3">{children}</p>
 )
@@ -16,10 +18,10 @@ function UnitToggle({ options, value, onChange }) {
         <button
           key={opt.value}
           onClick={() => onChange(opt.value)}
-          className={`flex-1 py-2.5 text-sm font-medium transition-colors duration-150 ${
+          className={`flex-1 py-2.5 text-sm font-medium transition-colors duration-150 ${RING} ${
             value === opt.value
               ? 'bg-amber text-olive-900 font-semibold'
-              : 'text-slate-muted'
+              : 'text-slate-muted hover:text-white'
           }`}
         >
           {opt.label}
@@ -70,26 +72,24 @@ export default function Settings() {
     queryClient.invalidateQueries({ queryKey: ['weather'] })
   }
 
-  // Last query timestamp from cache
   const allCached = queryClient.getQueryCache().getAll()
   const lastUpdatedAt = allCached.reduce(
     (max, q) => Math.max(max, q.state.dataUpdatedAt ?? 0),
     0
   )
   const lastUpdated = lastUpdatedAt ? new Date(lastUpdatedAt) : null
-
   const favoriteRivers = favorites.map(id => getRiverById(id)).filter(Boolean)
 
   return (
     <div>
-      <header className="bg-olive-900 sticky top-0 z-20 px-4 h-14 flex items-center">
+      <header className="bg-olive-900 sticky top-0 z-20 px-4 h-14 flex items-center md:px-6">
         <h1 className="font-river text-amber text-xl">Settings</h1>
       </header>
 
-      <div className="px-4 py-4">
+      <div className="max-w-2xl px-4 md:px-6 py-4 space-y-4">
 
         {/* Section 1 — MY RIVERS */}
-        <div className="bg-olive-800 rounded-xl p-4 mb-4">
+        <div className="bg-olive-800 rounded-xl p-4">
           <SectionHeading>My Rivers</SectionHeading>
           {favoriteRivers.length === 0 ? (
             <p className="text-slate-muted text-sm">
@@ -101,11 +101,13 @@ export default function Settings() {
                 <div key={river.id} className="flex items-center justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <p className="text-white text-sm font-medium truncate">{river.name}</p>
-                    <p className="text-slate-muted text-xs truncate">{river.section} · {river.state}</p>
+                    <p className="text-slate-muted text-xs truncate">
+                      {river.section} · {river.state}
+                    </p>
                   </div>
                   <button
                     onClick={() => toggleFavorite(river.id)}
-                    className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-muted hover:text-white transition-colors"
+                    className={`min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-muted hover:text-white transition-colors ${RING}`}
                     aria-label={`Remove ${river.name}`}
                   >
                     <X size={16} />
@@ -117,7 +119,7 @@ export default function Settings() {
         </div>
 
         {/* Section 2 — UNITS & DISPLAY */}
-        <div className="bg-olive-800 rounded-xl p-4 mb-4 space-y-4">
+        <div className="bg-olive-800 rounded-xl p-4 space-y-4">
           <SectionHeading>Units &amp; Display</SectionHeading>
 
           <div>
@@ -146,7 +148,7 @@ export default function Settings() {
         </div>
 
         {/* Section 3 — FLOW ALERTS */}
-        <div className="bg-olive-800 rounded-xl p-4 mb-4">
+        <div className="bg-olive-800 rounded-xl p-4">
           <SectionHeading>Flow Alerts</SectionHeading>
           {favoriteRivers.length === 0 ? (
             <p className="text-slate-muted text-sm">Add favorite rivers to set flow alerts.</p>
@@ -157,7 +159,7 @@ export default function Settings() {
                   <p className="text-white text-sm flex-1 min-w-0 truncate">{river.name}</p>
                   <button
                     onClick={() => toggleAlert(river.id)}
-                    className={`relative flex-shrink-0 w-12 h-6 rounded-full transition-colors duration-200 ${
+                    className={`relative flex-shrink-0 w-12 h-6 rounded-full transition-colors duration-200 ${RING} ${
                       alerts[river.id] ? 'bg-teal' : 'bg-olive-700'
                     }`}
                     aria-pressed={!!alerts[river.id]}
@@ -179,7 +181,7 @@ export default function Settings() {
         </div>
 
         {/* Section 4 — DATA */}
-        <div className="bg-olive-800 rounded-xl p-4 mb-4 space-y-3">
+        <div className="bg-olive-800 rounded-xl p-4 space-y-3">
           <SectionHeading>Data</SectionHeading>
           <div className="flex items-center justify-between">
             <span className="text-slate-muted text-sm">Last refreshed</span>
@@ -189,14 +191,14 @@ export default function Settings() {
           </div>
           <button
             onClick={handleRefreshAll}
-            className="w-full bg-olive-700 rounded-lg py-3 text-sm text-white font-medium transition-colors active:bg-olive-600"
+            className={`w-full bg-olive-700 rounded-lg py-3 text-sm text-white font-medium transition-colors hover:bg-olive-600 active:bg-olive-600 ${RING}`}
           >
             Refresh All Data
           </button>
         </div>
 
         {/* Section 5 — ABOUT */}
-        <div className="bg-olive-800 rounded-xl p-4 mb-4 space-y-2">
+        <div className="bg-olive-800 rounded-xl p-4 space-y-2">
           <SectionHeading>About</SectionHeading>
           <div className="flex items-center justify-between">
             <span className="text-slate-muted text-sm">Version</span>
@@ -216,7 +218,7 @@ export default function Settings() {
             href="https://www.usgs.gov/legal"
             target="_blank"
             rel="noopener noreferrer"
-            className="block text-teal text-sm pt-1"
+            className={`block text-teal text-sm pt-1 hover:text-teal-light transition-colors ${RING}`}
           >
             USGS Terms of Service →
           </a>

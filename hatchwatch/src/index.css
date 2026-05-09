@@ -10,3 +10,7 @@ body { background-color: #1A2410; color: #E2E8F0; font-family: 'DM Sans', sans-s
 
 html, body { overflow-x: hidden; max-width: 100vw; }
 .scroll-container { -webkit-overflow-scrolling: touch; }
+
+/* Remove default browser focus ring; our focus-visible utilities handle it */
+*:focus { outline: none; }
+*:focus-visible { outline: revert; }
