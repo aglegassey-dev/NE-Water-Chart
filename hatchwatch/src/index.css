@@ -1,0 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body { background-color: #1A2410; color: #E2E8F0; font-family: 'DM Sans', sans-serif; }
+.font-river { font-family: 'Playfair Display', serif; }
+* { -webkit-tap-highlight-color: transparent; }
