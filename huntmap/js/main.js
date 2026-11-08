@@ -2,7 +2,7 @@ import { contains, nearestEdge, distM, bearingDeg, cardinal, yd, ft, esc, sunTim
 import { BASES, OVERLAYS, PRESETS, setupPanes, makeLayer } from './layers.js';
 import { db, uid } from './db.js';
 import { toGPX, parseGeoFile, shareOrDownload } from './gpx.js';
-import { planDownload, download, recordArea, listAreas, removeAreaRecord, clearAll, storageText } from './offline.js';
+import { planDownload, download, recordArea, listAreas, removeAreaRecord, clearAll, storageText, planPreserves, PACK_LEVELS, PACK_ID } from './offline.js';
 import { getWind, windArrow } from './weather.js';
 
 const L = window.L;
@@ -539,7 +539,67 @@ function guessType(s) {
 
 // ===================================================================== offline sheet
 let dlAbort = null;
+
+// ---- one-tap "All Freeport preserves" pack
+let packLevel = store.get('packLevel', 'high'), packAbort = null, packPlanTimer = null, packPlan = null;
+const packFeats = feats.filter((f) => f.properties.status !== 'unmapped');
+const packDefs = () => [...BASES, ...OVERLAYS].filter((d) => PACK_LEVELS.high.caps[d.id] != null);
+const packSelected = () => { const off = new Set(store.get('packOff', [])); return packDefs().filter((d) => !off.has(d.id)); };
+function renderPack() {
+  document.querySelectorAll('#packLevel button').forEach((b) => b.classList.toggle('sel', b.dataset.level === packLevel));
+  const off = new Set(store.get('packOff', []));
+  $('packLayers').innerHTML = packDefs().map((d) =>
+    `<label class="opt compact"><input type="checkbox" data-pk="${d.id}" ${off.has(d.id) ? '' : 'checked'}><span><b>${d.name}</b></span></label>`).join('');
+  const rec = listAreas().find((a) => a.id === PACK_ID);
+  $('packStatus').textContent = rec ? `✓ Downloaded ${fmtDate(rec.date)}: ${PACK_LEVELS[rec.level]?.label.replace(' (recommended)', '') || ''}, ${rec.mb} MB${rec.failed ? `, ${rec.failed} tiles missing (tap Download again)` : ''}` : '';
+  $('packStart').textContent = rec ? 'Update / resume download' : 'Download all preserves';
+  schedulePackPlan();
+}
+function schedulePackPlan() {
+  $('packEstimate').textContent = 'Calculating…'; $('packStart').disabled = true;
+  clearTimeout(packPlanTimer);
+  packPlanTimer = setTimeout(() => {
+    packPlan = planPreserves(packSelected(), packFeats, packLevel);
+    $('packEstimate').textContent = `${packPlan.urls.length.toLocaleString()} tiles · about ${packPlan.estMB >= 1024 ? (packPlan.estMB / 1024).toFixed(1) + ' GB' : packPlan.estMB + ' MB'}. ` +
+      'Already-saved tiles are skipped, so you can pause and resume.';
+    $('packStart').disabled = !packPlan.urls.length || !!packAbort;
+  }, 30);
+}
+$('packLevel').addEventListener('click', (e) => { const b = e.target.closest('[data-level]'); if (!b || packAbort) return; packLevel = b.dataset.level; store.set('packLevel', packLevel); renderPack(); });
+$('packLayers').addEventListener('change', () => {
+  store.set('packOff', [...document.querySelectorAll('[data-pk]')].filter((i) => !i.checked).map((i) => i.dataset.pk));
+  schedulePackPlan();
+});
+$('packStart').onclick = async () => {
+  if (!packPlan) return;
+  if (!navigator.onLine) return toast('No connection. Connect to Wi-Fi first.');
+  const plan = packPlan, samples = [];
+  packAbort = new AbortController();
+  let lock = null; try { lock = await navigator.wakeLock?.request('screen'); } catch { /* optional */ }
+  $('packStart').style.display = 'none'; $('packCancel').style.display = ''; $('packProg').style.display = '';
+  const r = await download(plan.urls, (d, t, f, bytes) => {
+    $('packBar').style.width = `${(100 * d) / t}%`;
+    const now = Date.now(); samples.push([now, d]); while (samples.length > 2 && now - samples[0][0] > 30000) samples.shift();
+    const [t1, d1] = samples[0], rate = (d - d1) / Math.max(1, (now - t1) / 1000), eta = Math.max(1, Math.round((t - d) / Math.max(rate, 0.1) / 60));
+    $('packProgTxt').textContent = `${d.toLocaleString()} / ${t.toLocaleString()} · ${(bytes / 1048576).toFixed(0)} MB · ~${eta} min left${f ? ` · ${f} failed` : ''}`;
+  }, packAbort.signal).catch((err) => { toast(err.message, 6000); return null; });
+  try { await lock?.release(); } catch { /* ignore */ }
+  const paused = packAbort.signal.aborted; packAbort = null;
+  $('packStart').style.display = ''; $('packCancel').style.display = 'none'; $('packProg').style.display = 'none'; $('packBar').style.width = '0';
+  if (r && !paused) {
+    const prev = listAreas().find((a) => a.id === PACK_ID);
+    removeAreaRecord(PACK_ID);
+    const bb = packFeats.reduce((a, f) => { const b = f.bbox; return [Math.min(a[0], b[1]), Math.min(a[1], b[0]), Math.max(a[2], b[3]), Math.max(a[3], b[2])]; }, [90, 180, -90, -180]);
+    recordArea({ id: PACK_ID, name: 'All Freeport preserves', tiles: plan.urls.length, zMax: Math.max(...Object.values(PACK_LEVELS[packLevel].caps)),
+      level: packLevel, mb: Math.round((r.bytes / 1048576) + (prev && r.bytes < 1048576 * 5 ? prev.mb : 0)), failed: r.failed, date: Date.now(), bounds: bb });
+    toast(r.failed ? `Done, but ${r.failed} tiles failed. Tap Download again to retry them.` : 'All preserves saved for offline use ✓', 6000);
+  } else if (paused) toast('Paused. Tap Download to resume. Saved tiles are kept.');
+  renderOffline();
+};
+$('packCancel').onclick = () => packAbort?.abort();
+
 function renderOffline() {
+  renderPack();
   const b = map.getBounds();
   const w = distM(b.getWest(), b.getCenter().lat, b.getEast(), b.getCenter().lat), h = distM(b.getWest(), b.getSouth(), b.getWest(), b.getNorth());
   const sqmi = (w * h) / 2.59e6;

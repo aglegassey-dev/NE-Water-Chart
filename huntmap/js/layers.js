@@ -98,27 +98,39 @@ function recolorContour(d) {
   }
 }
 
-// ---- Leaflet layer classes ----
-const FnTileLayer = L.TileLayer.extend({
-  getTileUrl(c) { return this.options.urlFn(c.z, c.x, c.y); },
-});
-const RecolorLayer = L.GridLayer.extend({
+// ---- Leaflet layer class ----
+// Every layer draws tiles onto a canvas. If a tile can't be fetched because there's no signal and it
+// isn't downloaded, it falls back to the nearest downloaded parent tile (up to 6 zooms up) and
+// sharpens/upscales that quadrant. Zooming in past the downloaded detail never shows blank map offline.
+const MAX_FALLBACK = 6;
+const SmartLayer = L.GridLayer.extend({
   createTile(c, done) {
     const canvas = document.createElement('canvas');
-    fetch(this.options.urlFn(c.z, c.x, c.y), { mode: 'cors' })
-      .then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
+    this._load(c, 0, canvas, done);
+    return canvas;
+  },
+  _load(c, d, canvas, done) {
+    const scale = 2 ** d, z = c.z - d, px = Math.floor(c.x / scale), py = Math.floor(c.y / scale);
+    fetch(this.options.urlFn(z, px, py), { mode: 'cors' })
+      .then((r) => { if (!r.ok) { const e = new Error(r.status); e.http = true; throw e; } return r.blob(); })
       .then((b) => createImageBitmap(b))
       .then((img) => {
+        const sw = img.width / scale, sh = img.height / scale;
         canvas.width = img.width; canvas.height = img.height;
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        ctx.drawImage(img, 0, 0);
-        const id = ctx.getImageData(0, 0, img.width, img.height);
-        this.options.recolor(id.data);
-        ctx.putImageData(id, 0, 0);
+        const ctx = canvas.getContext('2d', { willReadFrequently: !!this.options.recolor });
+        ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, (c.x - px * scale) * sw, (c.y - py * scale) * sh, sw, sh, 0, 0, canvas.width, canvas.height);
+        if (this.options.recolor) {
+          const id = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          this.options.recolor(id.data); ctx.putImageData(id, 0, 0);
+        }
         done(null, canvas);
       })
-      .catch((e) => done(e, canvas));
-    return canvas;
+      .catch((e) => {
+        // Network failure (offline & not cached) → try the parent tile. HTTP errors (e.g. 404 blank tile) don't retry.
+        if (!e.http && d < MAX_FALLBACK && z - 1 >= 0) this._load(c, d + 1, canvas, done);
+        else done(e, canvas);
+      });
   },
 });
 
@@ -187,9 +199,10 @@ export function makeLayer(def) {
   const layers = def.sources.map((s, i) => {
     const opts = {
       urlFn: s.url, maxNativeZoom: s.maxNative, maxZoom: 21, minZoom: def.minZoom || 0, opacity: s.opacity ?? 1,
-      pane: s.pane || 'tilePane', crossOrigin: 'anonymous', attribution: i === 0 ? def.attribution : undefined,
+      pane: s.pane || 'tilePane', attribution: i === 0 ? def.attribution : undefined, recolor: s.recolor,
+      updateWhenIdle: false, keepBuffer: 3,
     };
-    return s.recolor ? new RecolorLayer({ ...opts, recolor: s.recolor }) : new FnTileLayer('', opts);
+    return new SmartLayer(opts);
   });
   return L.layerGroup(layers);
 }

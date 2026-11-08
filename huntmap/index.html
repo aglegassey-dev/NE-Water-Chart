@@ -97,7 +97,20 @@
 <!-- Offline -->
 <div class="sheet" id="sheetOffline" role="dialog" aria-label="Offline maps">
   <div class="sheet-head"><h2>Offline maps</h2><button class="btn" data-close>Done</button></div>
-  <p class="muted">Download the area on screen before you head out. Downloaded maps, terrain layers, zones and your waypoints all work with no cell signal.</p>
+  <div class="pack" id="pack">
+    <div class="pack-head"><span class="pack-ico">🦌</span><div><b>All Freeport preserves</b><small>Every preserve on the FCT hunting map plus ~300 yd around it, every layer, in one tap. Do it at home on Wi-Fi.</small></div></div>
+    <div class="seg" id="packLevel">
+      <button data-level="high" class="sel">High detail<small>Recommended</small></button>
+      <button data-level="max">Maximum<small>Sharpest, about 2× the size</small></button>
+    </div>
+    <div id="packLayers" class="grid2"></div>
+    <p class="muted small" id="packEstimate">Calculating…</p>
+    <div class="progress" id="packProg" style="display:none"><div id="packBar"></div><span id="packProgTxt"></span></div>
+    <div class="btnrow"><button class="btn primary" id="packStart">Download all preserves</button><button class="btn" id="packCancel" style="display:none">Pause</button></div>
+    <p class="small" id="packStatus"></p>
+  </div>
+  <h3>Or download the area on screen</h3>
+  <p class="muted">For spots outside the preserves. Pan and zoom to the area first.</p>
   <p><b id="offArea"></b></p>
   <label class="field">Name<input id="offName" placeholder="e.g. Simpson Woods" /></label>
   <label class="field">Detail

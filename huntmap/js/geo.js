@@ -93,3 +93,9 @@ export function sunTimes(date, lat, lon) {
 export const hm = (d) => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
 export const fmtDate = (t) => new Date(t).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+
+/** Lon/lat bounds of an XYZ tile → [west, south, east, north] */
+export function tileBoundsLonLat(z, x, y) {
+  const n = 2 ** z, lat = (t) => (Math.atan(Math.sinh(Math.PI * (1 - (2 * t) / n))) * 180) / Math.PI;
+  return [(x / n) * 360 - 180, lat(y + 1), ((x + 1) / n) * 360 - 180, lat(y)];
+}

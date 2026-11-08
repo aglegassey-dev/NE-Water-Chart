@@ -21,8 +21,11 @@ It's a static installable web app (PWA): no build step, no server, no accounts. 
   with notes and photos. Drag to move, and tap **Go** to navigate with live distance and bearing.
 - **Tracks:** ● records your walk.
 - **GPX/KML import and GPX export:** compatible with onX, Garmin and Gaia.
-- **Offline maps:** download every selected layer for the area on screen. Zones, waypoints and GPS
-  work with no signal.
+- **Offline maps:** one tap on **Download all preserves** saves every layer for every preserve on the
+  FCT hunting map plus ~300 yd around it. *High detail* is ~11k tiles / ~360 MB; *Maximum* is ~26k
+  tiles / ~680 MB. You can pause and resume, and already-saved tiles are skipped. You can also download
+  any area on screen. When you zoom past the saved detail with no signal, the map sharpens the nearest
+  saved tile instead of going blank. Zones, waypoints and GPS work with no signal.
 - **Wind:** current conditions and hourly forecast with scent-direction arrows (Open-Meteo).
 
 Waypoints, photos and tracks are stored on the device (IndexedDB). Export a GPX as a backup.
@@ -41,7 +44,7 @@ Local test: `python3 -m http.server 8000` in this folder, then open http://local
 | `index.html`, `app.css` | UI shell and styles |
 | `js/main.js` | App wiring: map, zones, GPS, waypoints, tracks, sheets |
 | `js/layers.js` | Base maps and terrain/forest overlays (URL functions shared with offline download) |
-| `js/offline.js` | Offline area downloads into Cache Storage (`hunt-tiles`) |
+| `js/offline.js` | Offline downloads into Cache Storage (`hunt-tiles`): preserves pack (`PACK_LEVELS` sets per-layer max zoom) and on-screen areas |
 | `js/geo.js`, `js/db.js`, `js/gpx.js`, `js/weather.js` | Geometry/sun math, IndexedDB, GPX/KML, wind |
 | `sw.js` | Service worker: offline app shell + cache-first tiles. **Bump `VERSION` when shell files change.** |
 | `data.js` | Generated zone data (do not edit by hand) |
