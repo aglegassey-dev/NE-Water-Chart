@@ -623,8 +623,8 @@ $('btnInstall').onclick = async () => {
 if (!isStandalone && /iphone|ipad|ipod/i.test(navigator.userAgent)) { $('iosInstall').style.display = ''; $('installBox').style.display = ''; $('btnInstall').style.display = 'none'; }
 const netBanner = () => $('offlineBanner').style.display = navigator.onLine ? 'none' : '';
 window.addEventListener('online', netBanner); window.addEventListener('offline', netBanner); netBanner();
-if ('serviceWorker' in navigator && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-  navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
 if (!store.get('seenInfo2', false)) { openSheet('sheetInfo'); store.set('seenInfo2', true); }
 
