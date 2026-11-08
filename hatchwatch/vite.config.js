@@ -20,10 +20,31 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-        // /hunt/ is a standalone page (Freeport hunting map) — don't serve the SPA shell for it
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
+        // /hunt/ is a standalone app (Freeport Hunt Map) — don't serve the SPA shell for it
         navigateFallbackDenylist: [/^\/hunt/],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        runtimeCaching: [
+          {
+            // Hunt Map tiles: cache-first so viewed and downloaded areas work with no signal.
+            // Cache name must match TILE_CACHE in public/hunt/js/offline.js.
+            urlPattern: ({ url }) =>
+              ['server.arcgisonline.com', 'basemap.nationalmap.gov', 'carto.nationalmap.gov', 'tile.openstreetmap.org', 'www.mrlc.gov', 'imagery.geoplatform.gov'].includes(url.hostname) ||
+              (url.hostname === 'gis.maine.gov' && url.pathname.endsWith('/exportImage')),
+            handler: 'CacheFirst',
+            options: { cacheName: 'hunt-tiles', cacheableResponse: { statuses: [0, 200] } },
+          },
+          {
+            urlPattern: ({ url }) => url.hostname === 'gis.maine.gov' && url.pathname.endsWith('/identify'),
+            handler: 'NetworkFirst',
+            options: { cacheName: 'hunt-elevation', networkTimeoutSeconds: 4, expiration: { maxEntries: 500 } },
+          },
+          {
+            urlPattern: ({ url }) => url.hostname === 'api.open-meteo.com',
+            handler: 'NetworkFirst',
+            options: { cacheName: 'weather', networkTimeoutSeconds: 5, expiration: { maxEntries: 20, maxAgeSeconds: 6 * 3600 } },
+          },
+        ],
       },
     }),
   ],
