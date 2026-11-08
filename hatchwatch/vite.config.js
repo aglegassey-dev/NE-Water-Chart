@@ -21,6 +21,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        // /hunt/ is a standalone page (Freeport hunting map) — don't serve the SPA shell for it
+        navigateFallbackDenylist: [/^\/hunt/],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
       },
     }),
   ],

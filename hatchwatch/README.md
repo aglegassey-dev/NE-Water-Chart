@@ -47,3 +47,25 @@ The USGS station ID drives all live data (discharge, gauge height, water tempera
 - **Streamflow & gauge**: [USGS Water Services](https://waterservices.usgs.gov/) (no key required)
 - **Weather**: [Open-Meteo](https://open-meteo.com/) (no key required)
 - **Hatch data**: Curated for Maine, New Hampshire & Vermont
+
+## Freeport Hunt Map (`/hunt/`)
+
+A standalone, mobile-first page at `public/hunt/` (served at `/hunt/` on the deployed site) that shows
+Freeport Conservation Trust preserves colored by hunting status, with live GPS:
+
+- **Your status:** firearm & bow, bow only, no hunting, or outside FCT land, plus the distance to the boundary
+- Warns when GPS accuracy is larger than your distance to a boundary
+- About 100-yard firearm safety circles around Maine E911 address points
+- Sunday warning and calculated legal shooting hours (30 min before sunrise to 30 min after sunset)
+- Tap anywhere to check a spot. Satellite, topo or street base maps.
+- Works offline after the first visit (boundaries and GPS). Base map tiles need signal.
+
+GPS requires HTTPS (Netlify provides it). The map is a guide only. Posted signs and FCT rules take priority.
+
+**Updating data:** hunting status for each parcel is set in `STATUS` in `scripts/build-hunt-data.py`
+(transcribed from FCT's "Hunting on Freeport Conservation Trust Preserves" map). Boundaries and address
+points are downloaded from Maine GeoLibrary. Regenerate with:
+
+```bash
+python3 scripts/build-hunt-data.py   # writes public/hunt/data.js
+```
